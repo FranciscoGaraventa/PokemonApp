@@ -1,4 +1,7 @@
+import 'package:pokemon_app/src/domain/entities/other_sprites.dart';
+
 import '../../domain/entities/sprites.dart';
+import 'other_model.dart';
 
 class SpritesModel extends Sprites {
   SpritesModel({
@@ -10,6 +13,7 @@ class SpritesModel extends Sprites {
     String? frontFemale,
     String? frontShiny,
     String? frontShinyFemale,
+    OtherSprites? other,
   }) : super(
           backDefault: backDefault,
           backFemale: backFemale,
@@ -19,6 +23,7 @@ class SpritesModel extends Sprites {
           frontFemale: frontFemale,
           frontShiny: frontShiny,
           frontShinyFemale: frontShinyFemale,
+          other: other,
         );
 
   factory SpritesModel.fromJson(Map<String, dynamic> json) => SpritesModel(
@@ -30,5 +35,6 @@ class SpritesModel extends Sprites {
         frontFemale: json['front_female'],
         frontShiny: json['front_shiny'],
         frontShinyFemale: json['front_shiny_female'],
+        other: OtherModel.fromJson(json['other'] as Map<String, dynamic>),
       );
 }

@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
+import 'package:pokemon_app/src/domain/usecases/get_pokemon_evolutions_usecase.dart';
 
 import '../../core/model/rx_nullable.dart';
 import '../../domain/entities/property.dart';
 import '../../core/utils/constants.dart';
-import '../../domain/usecases/get_pokemon_by_id_usercase.dart';
+import '../../domain/usecases/get_pokemon_by_id_usecase.dart';
 import '../../core/resources/data_state.dart';
 import '../../domain/entities/pokemon.dart';
 import '../../domain/usecases/get_pokemon_usecase.dart';
@@ -45,7 +46,7 @@ class PokemonController extends GetxController with StateMixin<List<Pokemon>> {
     return pokemons;
   }
 
-  void _extractLimitOffset({required String url}){
+  void _extractLimitOffset({required String url}) {
     var subStringList = url.split('&');
     offset.value = int.parse(
       subStringList.first.replaceAll(
@@ -66,7 +67,7 @@ class PokemonController extends GetxController with StateMixin<List<Pokemon>> {
       null,
       status: RxStatus.loading(),
     );
-    switch(pageType){
+    switch (pageType) {
       case PageType.initialPage:
         break;
       case PageType.nextPage:

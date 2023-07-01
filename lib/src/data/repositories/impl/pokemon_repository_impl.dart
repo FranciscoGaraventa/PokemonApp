@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:pokemon_app/src/data/models/evolution_model.dart';
+import 'package:pokemon_app/src/data/models/species_model.dart';
 
 import '../../datasources/remote/rest_client.dart';
 import '../../../core/resources/data_state.dart';
@@ -43,6 +45,46 @@ class PokemonRepositoryImpl implements IPokemonRepository {
   Future<DataState<PokemonModel>> getPokemonById({required int id}) async {
     try {
       final response = await _restClient.getPokemonById(id);
+      if (response.response.statusCode == HttpStatus.ok) {
+        return DataSuccess(response.data);
+      }
+      return DataFailed(
+        DioError(
+          error: response.response.statusMessage,
+          response: response.response,
+          type: DioErrorType.response,
+          requestOptions: response.response.requestOptions,
+        ),
+      );
+    } on DioError catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<EvolutionModel>> getPokemonEvolutions({required int id}) async {
+    try {
+      final response = await _restClient.getPokemonEvolution(id);
+      if (response.response.statusCode == HttpStatus.ok) {
+        return DataSuccess(response.data);
+      }
+      return DataFailed(
+        DioError(
+          error: response.response.statusMessage,
+          response: response.response,
+          type: DioErrorType.response,
+          requestOptions: response.response.requestOptions,
+        ),
+      );
+    } on DioError catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<SpeciesModel>> getPokemonSpecie({required int id}) async {
+    try {
+      final response = await _restClient.getPokemonSpecies(id);
       if (response.response.statusCode == HttpStatus.ok) {
         return DataSuccess(response.data);
       }

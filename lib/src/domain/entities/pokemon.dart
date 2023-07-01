@@ -42,4 +42,13 @@ class Pokemon {
   final List<Stat> stats;
   final List<Type> types;
   final int weight;
+
+  String formatPokemonId() {
+    switch(id.toString().length){
+      case 1: return '#00$id';
+      case 2: return '#0$id';
+      case 3: return '#$id';
+    }
+    return id.toString();
+  }
 }

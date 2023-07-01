@@ -1,3 +1,5 @@
+import 'other_sprites.dart';
+
 class Sprites {
   Sprites({
     this.backDefault,
@@ -8,6 +10,7 @@ class Sprites {
     this.frontFemale,
     this.frontShiny,
     this.frontShinyFemale,
+    this.other,
   });
 
   final String? backDefault;
@@ -18,4 +21,5 @@ class Sprites {
   final String? frontFemale;
   final String? frontShiny;
   final String? frontShinyFemale;
+  final OtherSprites? other;
 }
