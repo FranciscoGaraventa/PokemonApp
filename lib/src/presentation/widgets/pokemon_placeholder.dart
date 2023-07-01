@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../core/utils/dimens.dart';
 
@@ -15,7 +15,7 @@ class _PokemonPlaceholderState extends State<PokemonPlaceholder> {
 
   static const gridDelegateCrossAxisCount = 2;
   static const cardElevation = 5.0;
-  static const gridTileFooterHeight = 30.0;
+  static const lottieAssetRoute = 'assets/lottie/pokeball.json';
 
   Widget _cardPlaceHolder() {
     return Card(
@@ -26,23 +26,17 @@ class _PokemonPlaceholderState extends State<PokemonPlaceholder> {
         ),
       ),
       child: GridTile(
-        footer: Shimmer.fromColors(
-          baseColor: Colors.grey.shade700,
-          highlightColor: Colors.grey.shade300,
-          child: Container(
-            height: gridTileFooterHeight,
-            decoration: const BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.only(
-                bottomLeft:
-                    Radius.circular(CustomBorderRadius.borderRadiusXMedium),
-                bottomRight:
-                    Radius.circular(CustomBorderRadius.borderRadiusXMedium),
-              ),
-            ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: CustomPadding.paddingXBig,
+            vertical: CustomPadding.paddingXBig,
+          ),
+          child: Lottie.asset(
+            lottieAssetRoute,
+            alignment: Alignment.center,
+            fit: BoxFit.cover,
           ),
         ),
-        child: const SizedBox.shrink(),
       ),
     );
   }
@@ -62,11 +56,7 @@ class _PokemonPlaceholderState extends State<PokemonPlaceholder> {
           BuildContext context,
           int index,
         ) {
-          return Shimmer.fromColors(
-            baseColor: Colors.grey.shade400,
-            highlightColor: Colors.grey.shade300,
-            child: _cardPlaceHolder(),
-          );
+          return _cardPlaceHolder();
         },
       ),
     );

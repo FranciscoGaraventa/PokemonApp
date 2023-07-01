@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shimmer/shimmer.dart';
 
+import '../../config/route/named_route.dart';
 import '../../core/utils/dimens.dart';
 import '../../domain/entities/pokemon.dart';
 import '../blocs/pokemon_controller.dart';
 import '../widgets/pokemon_base_text.dart';
+import '../widgets/pokemon_image.dart';
 import '../widgets/pokemon_placeholder.dart';
 
 class HomeView extends StatefulWidget {
@@ -21,9 +22,7 @@ class _HomeViewState extends State<HomeView> {
   static const cardElevation = 5.0;
   static const gridTileFooterHeight = 50.0;
   static const bottomNavigationBarHeight = 40.0;
-  static const imageProviderScale = 0.6;
   static const assetImageSize = 50.0;
-  static const cardPlaceHolderAssetImage = 'assets/pikachu_placeholder.png';
   static const appBarLogo = 'assets/pokemon_logo.png';
   static const nextButtonLabel = 'NEXT';
   static const previousButtonLabel = 'PREVIOUS';
@@ -50,70 +49,51 @@ class _HomeViewState extends State<HomeView> {
           BuildContext context,
           int index,
         ) {
-          return Card(
-            semanticContainer: true,
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            elevation: cardElevation,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(CustomBorderRadius.borderRadiusXMedium),
-              ),
+          return InkWell(
+            onTap: () =>
+                Get.find<GlobalKey<NavigatorState>>().currentState?.pushNamed(
+              NamedRoute.pokemonDetailView,
+              arguments: {'pokemon': pokemons[index]},
             ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: CachedNetworkImage(
-                    imageUrl: pokemons[index].sprites.frontDefault ??
-                        pokemons[index].sprites.frontFemale!,
-                    imageBuilder:
-                        (BuildContext context, ImageProvider imageProvider) =>
-                        Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: imageProvider,
-                              scale: imageProviderScale,
-                              filterQuality: FilterQuality.high,
-                            ),
-                          ),
-                        ),
-                    placeholder: (context, url) => Center(
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.grey.shade700,
-                        highlightColor: Colors.grey.shade300,
-                        child: Image.asset(
-                          cardPlaceHolderAssetImage,
-                          fit: BoxFit.cover,
-                          width: assetImageSize,
-                          height: assetImageSize,
+            child: Card(
+              semanticContainer: true,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              elevation: cardElevation,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(CustomBorderRadius.borderRadiusXMedium),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PokemonImage(
+                      sprites: pokemons[index].sprites,
+                    ),
+                  ),
+                  Container(
+                    height: gridTileFooterHeight,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(
+                            CustomBorderRadius.borderRadiusXMedium),
+                        bottomRight: Radius.circular(
+                            CustomBorderRadius.borderRadiusXMedium),
+                      ),
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: CustomPadding.paddingSmall),
+                        child: PokemonBaseText(
+                          text: pokemons[index].name.toUpperCase(),
                         ),
                       ),
                     ),
-                    errorWidget: (context, url, error) => const Center(
-                      child: Icon(Icons.error),
-                    ),
                   ),
-                ),
-                Container(
-                  height: gridTileFooterHeight,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft:
-                      Radius.circular(CustomBorderRadius.borderRadiusXMedium),
-                      bottomRight:
-                      Radius.circular(CustomBorderRadius.borderRadiusXMedium),
-                    ),
-                  ),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: CustomPadding.paddingSmall),
-                      child: PokemonBaseText(
-                        text: pokemons[index].name.toUpperCase(),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
