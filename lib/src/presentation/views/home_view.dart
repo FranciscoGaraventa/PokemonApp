@@ -1,7 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../core/utils/assets.dart';
+import '../blocs/pokemon_database_controller.dart';
 import '../../config/route/named_route.dart';
 import '../../core/utils/dimens.dart';
 import '../../domain/entities/pokemon.dart';
@@ -23,11 +24,11 @@ class _HomeViewState extends State<HomeView> {
   static const gridTileFooterHeight = 50.0;
   static const bottomNavigationBarHeight = 40.0;
   static const assetImageSize = 50.0;
-  static const appBarLogo = 'assets/pokemon_logo.png';
   static const nextButtonLabel = 'NEXT';
   static const previousButtonLabel = 'PREVIOUS';
 
   final pokemonController = Get.find<PokemonController>();
+  final pokemonDatabaseController = Get.find<PokemonDatabaseController>();
 
   @override
   void initState() {
@@ -49,49 +50,66 @@ class _HomeViewState extends State<HomeView> {
           BuildContext context,
           int index,
         ) {
-          return InkWell(
-            onTap: () =>
-                Get.find<GlobalKey<NavigatorState>>().currentState?.pushNamed(
-              NamedRoute.pokemonDetailView,
-              arguments: {'pokemon': pokemons[index]},
-            ),
-            child: Card(
-              semanticContainer: true,
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              elevation: cardElevation,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(CustomBorderRadius.borderRadiusXMedium),
-                ),
+          return Obx(
+            () => InkWell(
+              onTap: () =>
+                  Get.find<GlobalKey<NavigatorState>>().currentState?.pushNamed(
+                NamedRoute.pokemonDetailView,
+                arguments: {'pokemon': pokemons[index]},
               ),
-              child: Column(
+              child: Stack(
                 children: [
-                  Expanded(
-                    child: PokemonImage(
-                      sprites: pokemons[index].sprites,
-                    ),
-                  ),
-                  Container(
-                    height: gridTileFooterHeight,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(
-                            CustomBorderRadius.borderRadiusXMedium),
-                        bottomRight: Radius.circular(
-                            CustomBorderRadius.borderRadiusXMedium),
+                  Card(
+                    semanticContainer: true,
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    elevation: cardElevation,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(CustomBorderRadius.borderRadiusXMedium),
                       ),
                     ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: CustomPadding.paddingSmall),
-                        child: PokemonBaseText(
-                          text: pokemons[index].name.toUpperCase(),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: PokemonImage(
+                            sprites: pokemons[index].sprites,
+                          ),
                         ),
-                      ),
+                        Container(
+                          height: gridTileFooterHeight,
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(
+                                  CustomBorderRadius.borderRadiusXMedium),
+                              bottomRight: Radius.circular(
+                                  CustomBorderRadius.borderRadiusXMedium),
+                            ),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: CustomPadding.paddingSmall),
+                              child: PokemonBaseText(
+                                text: pokemons[index].name.toUpperCase(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  pokemonDatabaseController.favorites.value.firstWhereOrNull(
+                              (id) => id == pokemons[index].id) !=
+                          null
+                      ? Align(
+                          alignment: Alignment.topRight,
+                          child: SizedBox(
+                            width: 50.0,
+                            child: Image.asset('assets/gotcha.png'),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -107,10 +125,19 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(
         backgroundColor: Colors.red,
         title: Image.asset(
-          appBarLogo,
+          Assets.pokemonLogo,
           height: assetImageSize,
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () =>
+                Get.find<GlobalKey<NavigatorState>>().currentState?.pushNamed(
+                      NamedRoute.favoritesView,
+                    ),
+            icon: Image.asset(Assets.favoriteIcon),
+          )
+        ],
       ),
       body: Center(
         child: pokemonController.obx(

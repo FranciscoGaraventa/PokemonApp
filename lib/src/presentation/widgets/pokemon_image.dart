@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/utils/assets.dart';
 import '../../domain/entities/sprites.dart';
 
 class PokemonImage extends StatelessWidget {
@@ -19,7 +20,6 @@ class PokemonImage extends StatelessWidget {
 
   static const defaultImageProviderScale = 0.6;
   static const defaultAssetImageSize = 50.0;
-  static const cardPlaceHolderAssetImage = 'assets/pikachu_placeholder.png';
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class PokemonImage extends StatelessWidget {
       ),
       placeholder: (context, url) => Center(
         child: Image.asset(
-          cardPlaceHolderAssetImage,
+          Assets.cardPlaceHolderAssetImage,
           fit: BoxFit.cover,
           width: assetImageSize,
           height: assetImageSize,

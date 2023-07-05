@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pokemon_app/src/presentation/views/favorites_view.dart';
 import 'package:pokemon_app/src/presentation/views/pokemon_detail_view.dart';
 
 import '../../presentation/views/home_view.dart';
@@ -21,6 +22,12 @@ class AppRouter {
               builder: (context) => PokemonDetailView(
                 pokemon: arguments['pokemon'],
               ),
+            );
+            break;
+          case NamedRoute.favoritesView:
+            route = MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const FavoritesView(),
             );
             break;
         }

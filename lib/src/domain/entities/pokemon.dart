@@ -1,3 +1,5 @@
+import 'package:floor/floor.dart';
+
 import 'stat.dart';
 import 'sprites.dart';
 import 'moves.dart';
@@ -6,6 +8,7 @@ import 'abilities.dart';
 import 'game_indices.dart';
 import 'type.dart';
 
+@Entity(tableName: 'FAVORITE_POKEMON')
 class Pokemon {
   Pokemon({
     required this.id,
@@ -26,6 +29,7 @@ class Pokemon {
     required this.weight,
   });
 
+  @PrimaryKey()
   final int id;
   final List<Abilities> abilities;
   final int baseExperience;
