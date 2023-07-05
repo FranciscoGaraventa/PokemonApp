@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'package:pokemon_app/src/core/utils/dimens.dart';
-import 'package:pokemon_app/src/presentation/blocs/pokemon_evolution_controller.dart';
+import 'package:pokemon_app/src/presentation/blocs/pokemon_controller.dart';
 
+import '../../core/utils/assets.dart';
+import '../../core/utils/dimens.dart';
+import '../blocs/pokemon_database_controller.dart';
+import '../blocs/pokemon_evolution_controller.dart';
 import '../../config/route/named_route.dart';
 import '../../core/utils/colors.dart';
 import '../../domain/entities/stat.dart';
 import '../widgets/pokemon_base_text.dart';
 import '../../domain/entities/pokemon.dart';
-import '../../domain/entities/type.dart';
 import '../widgets/pokemon_image.dart';
+import '../widgets/pokemon_types.dart';
 
 class PokemonDetailView extends StatefulWidget {
   const PokemonDetailView({
@@ -32,25 +34,41 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
   static const statValueHeight = 20.0;
   static const maxStatValue = 100.0;
   static const statBarColorOpacity = 0.3;
-  static const pokemonTypeCrossAxisCount = 3;
-  static const pokemonTypeMainAxisSpacing = 4.0;
-  static const pokemonTypeCrossAxisSpacing = 4.0;
   static const backgroundColorOpacity = 0.4;
   static const gridDelegateCrossAxisCount = 2;
   static const emptyStateAssetSize = 100.0;
-  static const lottieAssetRoute = 'assets/lottie/pokeball.json';
-  static const emptyStateAssetRoute = 'assets/professor_oak.png';
+  static const tabBarIndicatorHeight = 3.0;
+  static const cardElevation = 1.0;
+  static const pokemonImageProviderScale = 0.5;
+  static const tabControllerLength = 2;
   static const emptyStateMessage = 'No evolutions found';
+  static const statsLabel = 'Stats';
+  static const evolutionsLabel = 'Evolutions';
+  static const pokemonSavedText = 'Pokemon catched!';
 
+  final PokemonController pokemonController = Get.find<PokemonController>();
   final PokemonEvolutionController pokemonEvolutionController =
       Get.find<PokemonEvolutionController>();
+  final PokemonDatabaseController pokemonDatabaseController =
+      Get.find<PokemonDatabaseController>();
 
   late TabController tabController;
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(
+      length: tabControllerLength,
+      vsync: this,
+    );
+
+    pokemonController.setPokemonDetailSelection(
+      id: widget.pokemon.id,
+      isSaved: pokemonDatabaseController.favorites.value
+              .firstWhereOrNull((id) => id == widget.pokemon.id) !=
+          null,
+    );
+
     tabController.addListener(() {
       if (tabController.index == 1) {
         pokemonEvolutionController.getPokemonEvolutions(id: widget.pokemon.id);
@@ -68,7 +86,7 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
           sprites: widget.pokemon.sprites,
           officialArtworkUrl:
               widget.pokemon.sprites.other?.officialArtwork.frontDefault,
-          imageProviderScale: 0.5,
+          imageProviderScale: pokemonImageProviderScale,
         ),
       ),
     );
@@ -144,46 +162,6 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
     );
   }
 
-  Widget _buildPokemonTypes({required List<Type> types}) {
-    return AlignedGridView.count(
-      itemCount: types.length,
-      crossAxisCount: types.length < pokemonTypeCrossAxisCount
-          ? types.length
-          : pokemonTypeCrossAxisCount,
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      mainAxisSpacing: pokemonTypeMainAxisSpacing,
-      crossAxisSpacing: pokemonTypeCrossAxisSpacing,
-      itemBuilder: (BuildContext context, int index) =>
-          _buildType(typeName: types[index].type.name),
-    );
-  }
-
-  Widget _buildType({required String typeName}) {
-    return Padding(
-      padding: const EdgeInsets.all(CustomPadding.paddingSmall),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            CustomBorderRadius.borderRadiusMedium,
-          ),
-          color: ColorUtils.getColorByPokemonType(typeName: typeName),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(CustomPadding.paddingXSmall),
-          child: Text(
-            typeName.capitalize!,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: CustomTextFontSize.fontSizeMedium,
-                fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildPokemonEvolutions({required List<Pokemon> evolutions}) {
     return GridView.builder(
       itemCount: evolutions.length,
@@ -198,7 +176,9 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
       ) {
         return InkWell(
           onTap: () {
-            Get.find<GlobalKey<NavigatorState>>().currentState?.pushReplacementNamed(
+            Get.find<GlobalKey<NavigatorState>>()
+                .currentState
+                ?.pushReplacementNamed(
               NamedRoute.pokemonDetailView,
               arguments: {'pokemon': evolutions[index]},
             );
@@ -206,7 +186,7 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
           child: Card(
             semanticContainer: true,
             clipBehavior: Clip.antiAliasWithSaveLayer,
-            elevation: 1.0,
+            elevation: cardElevation,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(CustomBorderRadius.borderRadiusXMedium),
@@ -216,7 +196,7 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
               sprites: evolutions[index].sprites,
               officialArtworkUrl:
                   evolutions[index].sprites.other?.officialArtwork.frontDefault,
-              imageProviderScale: 0.5,
+              imageProviderScale: pokemonImageProviderScale,
             ),
           ),
         );
@@ -233,7 +213,7 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
           vertical: CustomPadding.paddingXBig,
         ),
         child: Lottie.asset(
-          lottieAssetRoute,
+          Assets.pokeBallLottie,
           alignment: Alignment.center,
           fit: BoxFit.contain,
         ),
@@ -249,7 +229,7 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            emptyStateAssetRoute,
+            Assets.professorImage,
             fit: BoxFit.contain,
             width: emptyStateAssetSize,
             height: emptyStateAssetSize,
@@ -280,22 +260,22 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
       ),
       child: Column(
         children: [
-          _buildPokemonTypes(types: widget.pokemon.types),
+          PokemonTypes(types: widget.pokemon.types),
           TabBar(
             controller: tabController,
-            indicatorWeight: 3.0,
+            indicatorWeight: tabBarIndicatorHeight,
             indicatorColor: ColorUtils.getColorByPokemonType(
                 typeName: widget.pokemon.types.first.type.name),
             tabs: const [
               Tab(
                 child: Text(
-                  'Stats',
+                  statsLabel,
                   style: TextStyle(color: Colors.black),
                 ),
               ),
               Tab(
                 child: Text(
-                  'Evolutions',
+                  evolutionsLabel,
                   style: TextStyle(color: Colors.black),
                 ),
               ),
@@ -318,70 +298,96 @@ class _PokemonDetailViewState extends State<PokemonDetailView>
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: ColorUtils.getColorByPokemonType(
-              typeName: widget.pokemon.types.first.type.name),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              PokemonBaseText(
-                text: widget.pokemon.name,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: CustomPadding.paddingSmall),
-                child: Text(
-                  widget.pokemon.formatPokemonId(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: CustomTextFontSize.fontSizeMedium,
-                  ),
+      child: Obx(
+        () => Scaffold(
+          appBar: AppBar(
+            backgroundColor: ColorUtils.getColorByPokemonType(
+                typeName: widget.pokemon.types.first.type.name),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                PokemonBaseText(
+                  text: widget.pokemon.name,
                 ),
-              )
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: CustomPadding.paddingSmall),
+                  child: Text(
+                    widget.pokemon.formatPokemonId(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: CustomTextFontSize.fontSizeMedium,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            centerTitle: true,
+            actions: [
+              pokemonController.isPokemonSaved.value == false
+                  ? IconButton(
+                      onPressed: () {
+                        pokemonController.setPokemonDetailSelection(
+                          id: widget.pokemon.id,
+                          isSaved: true,
+                        );
+                        pokemonDatabaseController.savePokemon(
+                          pokemon: widget.pokemon,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: ColorUtils.getColorByPokemonType(
+                                typeName: widget.pokemon.types.first.type.name),
+                            content: const Text(
+                              pokemonSavedText,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: CustomTextFontSize.fontSizeXSmall,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.catching_pokemon_outlined),
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.catching_pokemon_outlined),
-            )
-          ],
-        ),
-        body: Container(
-          color: ColorUtils.getColorByPokemonType(
-                  typeName: widget.pokemon.types.first.type.name)
-              .withOpacity(backgroundColorOpacity),
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                top: MediaQuery.of(context).size.height * 0.3,
-                left: positionedZero,
-                right: positionedZero,
-                child: Padding(
-                  padding: const EdgeInsets.all(CustomPadding.paddingLarge),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(CustomBorderRadius.borderRadiusLarge),
+          body: Container(
+            color: ColorUtils.getColorByPokemonType(
+                    typeName: widget.pokemon.types.first.type.name)
+                .withOpacity(backgroundColorOpacity),
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  top: MediaQuery.of(context).size.height * 0.3,
+                  left: positionedZero,
+                  right: positionedZero,
+                  child: Padding(
+                    padding: const EdgeInsets.all(CustomPadding.paddingLarge),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(CustomBorderRadius.borderRadiusLarge),
+                        ),
                       ),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      child: _buildPokemonDetails(),
                     ),
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    child: _buildPokemonDetails(),
                   ),
                 ),
-              ),
-              Positioned.fill(
-                child: _buildPokemonImage(),
-              ),
-            ],
+                Positioned.fill(
+                  child: _buildPokemonImage(),
+                ),
+              ],
+            ),
           ),
         ),
       ),

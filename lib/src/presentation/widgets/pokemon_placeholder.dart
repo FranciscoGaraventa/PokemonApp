@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../core/utils/assets.dart';
 import '../../core/utils/dimens.dart';
 
 class PokemonPlaceholder extends StatefulWidget {
@@ -12,10 +13,8 @@ class PokemonPlaceholder extends StatefulWidget {
 
 class _PokemonPlaceholderState extends State<PokemonPlaceholder> {
   static const itemCount = 8;
-
   static const gridDelegateCrossAxisCount = 2;
   static const cardElevation = 5.0;
-  static const lottieAssetRoute = 'assets/lottie/pokeball.json';
 
   Widget _cardPlaceHolder() {
     return Card(
@@ -32,7 +31,7 @@ class _PokemonPlaceholderState extends State<PokemonPlaceholder> {
             vertical: CustomPadding.paddingXBig,
           ),
           child: Lottie.asset(
-            lottieAssetRoute,
+            Assets.pokeBallLottie,
             alignment: Alignment.center,
             fit: BoxFit.cover,
           ),

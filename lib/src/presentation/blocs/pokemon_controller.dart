@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:pokemon_app/src/domain/usecases/get_pokemon_evolutions_usecase.dart';
 
+import 'pokemon_database_controller.dart';
 import '../../core/model/rx_nullable.dart';
 import '../../domain/entities/property.dart';
 import '../../core/utils/constants.dart';
@@ -21,6 +21,13 @@ class PokemonController extends GetxController with StateMixin<List<Pokemon>> {
   RxInt offset = 0.obs;
   Rx<String?> previousPageUrl = RxNullable<String?>().setNull();
   Rx<String?> nextPageUrl = RxNullable<String?>().setNull();
+  RxInt currentPokemonSelected = 0.obs;
+  RxBool isPokemonSaved = false.obs;
+
+  void setPokemonDetailSelection({required int id, required bool isSaved}) {
+    currentPokemonSelected.value = id;
+    isPokemonSaved.value = isSaved;
+  }
 
   Future<List<Pokemon>> getPokemonsFromState({
     required DataState state,
@@ -99,7 +106,9 @@ class PokemonController extends GetxController with StateMixin<List<Pokemon>> {
         state: dataState,
         pageType: pageType,
       ).then(
-        (pokemonList) {
+        (pokemonList) async {
+          await Get.find<PokemonDatabaseController>()
+              .getFavoritesFromList(pokemonList: pokemonList);
           change(
             pokemonList,
             status:

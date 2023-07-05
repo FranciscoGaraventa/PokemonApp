@@ -1,6 +1,8 @@
+import 'package:json_class/json_class.dart';
+
 import 'property.dart';
 
-class Type {
+class Type extends JsonClass {
   Type({
     required this.slot,
     required this.type,
@@ -8,4 +10,10 @@ class Type {
 
   final int slot;
   final Property type;
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'slot': slot,
+        'type': type.toJson(),
+      };
 }

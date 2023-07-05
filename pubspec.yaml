@@ -20,6 +20,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   lottie: ^2.3.2
   flutter_staggered_grid_view: ^0.6.2
+  floor_generator: ^1.4.2
+  floor: ^1.4.2
+  json_class: ^2.1.4+1
+  sqflite: ^2.2.8+4
+  envied: ^0.3.0+3
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +32,7 @@ dev_dependencies:
   build_runner: ^2.1.2
   retrofit_generator: ^4.2.0
   flutter_lints: ^2.0.0
+  envied_generator: ^0.3.0+3
 
 flutter:
   uses-material-design: true
@@ -35,6 +41,9 @@ flutter:
   - assets/pikachu_placeholder.png
   - assets/pokemon_logo.png
   - assets/professor_oak.png
+  - assets/favorites.png
+  - assets/gotcha.png
+  - assets/pokedex.jpeg
   - assets/lottie/pokeball.json
 
   fonts:
